@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import bcrypt from "bcryptjs";
+import { hash } from "bcryptjs";
 import knex from "../database/connection";
 
 //TODO criar um repository e um Service para esse controller
@@ -17,10 +17,11 @@ class PointsControler {
       services_id,
     } = request.body;
 
-    const password_hash = await bcrypt.hash(password, 8);
+    const password_hash = await hash(password, 8);
 
-    const insertedID = await knex("points").insert({
-      image: "image-fake",
+    const point = {
+      image:
+        "https://images.unsplash.com/photo-1562967915-6ba607ff7d05?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1052&q=80",
       name,
       email,
       password_hash,
@@ -30,19 +31,11 @@ class PointsControler {
       city,
       uf,
       services_id,
-    });
-
-    const point = {
-      image: "image-fake",
-      name,
-      email,
-      whatsapp,
-      latitude,
-      longitude,
-      city,
-      uf,
-      services_id,
     };
+
+    const insertedID = await knex("points").insert(point);
+
+    delete point.password_hash;
 
     const point_id = insertedID[0];
 
@@ -90,6 +83,29 @@ class PointsControler {
       point,
       service,
     });
+  }
+
+  async index(request: Request, response: Response) {
+    const { city, uf, service } = request.query;
+
+    const pointsQuery = await knex("points")
+      .join("services", "points.services_id", "=", "services.id")
+      .where("services.id", Number(service))
+      .where("city", String(city))
+      .where("uf", String(uf))
+      .distinct()
+      .select("points.*", "services.type");
+
+    if (!pointsQuery) {
+      return response.status(400).json({ message: "Point not Found" });
+    }
+
+    const points = pointsQuery.map((point) => {
+      delete point.password_hash;
+      return point;
+    });
+
+    return response.json(points);
   }
 }
 
