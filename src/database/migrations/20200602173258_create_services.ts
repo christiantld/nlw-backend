@@ -4,6 +4,7 @@ export async function up(knex: Knex): Promise<any> {
   return knex.schema.createTable("services", (table) => {
     table.increments("id").primary();
     table.string("type").notNullable();
+    table.string("image").notNullable();
   });
 }
 
