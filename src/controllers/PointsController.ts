@@ -1,5 +1,4 @@
 import { Request, Response } from "express";
-import { hash } from "bcryptjs";
 import knex from "../database/connection";
 
 //TODO criar um repository e um Service para esse controller
@@ -8,7 +7,6 @@ class PointsControler {
     const {
       name,
       email,
-      password,
       whatsapp,
       latitude,
       longitude,
@@ -17,14 +15,11 @@ class PointsControler {
       services_id,
     } = request.body;
 
-    const password_hash = await hash(password, 8);
-
     const point = {
       image:
         "https://images.unsplash.com/photo-1562967915-6ba607ff7d05?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1052&q=80",
       name,
       email,
-      password_hash,
       whatsapp,
       latitude,
       longitude,
@@ -34,8 +29,6 @@ class PointsControler {
     };
 
     const insertedID = await knex("points").insert(point);
-
-    delete point.password_hash;
 
     const point_id = insertedID[0];
 
@@ -100,12 +93,7 @@ class PointsControler {
       return response.status(400).json({ message: "Point not Found" });
     }
 
-    const points = pointsQuery.map((point) => {
-      delete point.password_hash;
-      return point;
-    });
-
-    return response.json(points);
+    return response.json(pointsQuery);
   }
 }
 
