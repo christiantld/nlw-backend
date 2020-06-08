@@ -9,7 +9,7 @@ class ServicesController {
       return {
         id: service.id,
         name: service.type,
-        image_url: `http://localhost:3333/uploads/${service.image}`,
+        image_url: `http://192.168.0.14:3333/uploads/${service.image}`,
       };
     });
 

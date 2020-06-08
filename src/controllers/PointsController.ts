@@ -16,8 +16,7 @@ class PointsControler {
     } = request.body;
 
     const point = {
-      image:
-        "https://images.unsplash.com/photo-1562967915-6ba607ff7d05?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1052&q=80",
+      image: request.file.filename,
       name,
       email,
       whatsapp,
@@ -62,7 +61,7 @@ class PointsControler {
 
     const point = {
       id: Number(id),
-      image,
+      image: `http://192.168.0.14:3333/temp/${image}`,
       name,
       email,
       whatsap,
@@ -93,7 +92,14 @@ class PointsControler {
       return response.status(400).json({ message: "Point not Found" });
     }
 
-    return response.json(pointsQuery);
+    const serializedPoints = pointsQuery.map((point) => {
+      return {
+        ...point,
+        image: `http://192.168.0.14:3333/temp/${point.image}`,
+      };
+    });
+
+    return response.json(serializedPoints);
   }
 }
 

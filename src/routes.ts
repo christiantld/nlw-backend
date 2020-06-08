@@ -1,16 +1,20 @@
 import express from "express";
+import multer from "multer";
+import multerConfig from "./config/multer";
 
 import PointsController from "./controllers/PointsController";
 import ServicesController from "./controllers/ServicesController";
 import SessionController from "./controllers/SessionController";
 
 const routes = express.Router();
+const upload = multer(multerConfig);
+
 const pointsController = new PointsController();
 const servicesController = new ServicesController();
 const sessionController = new SessionController();
 
-// Sign Up
-routes.post("/points", pointsController.store);
+// Create point
+routes.post("/points", upload.single("image"), pointsController.store);
 
 // Sign In
 routes.post("/session", sessionController.store);
